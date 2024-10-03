@@ -6,7 +6,6 @@ const fs = require("fs");
 const { Item, BatchDetail } = require("../Schema/TeaItems");
 
 
-console.log(process.env,"clas")
 const zohoClientId = "1000.ZW53NLBZ0Y1A3DG0LGWF0NU3N2ZTPI";
 const zohoClientSecret = "e80a1e3106a5e9e079908efebf32625c0185900ae1";
 const zohoRefreshToken =

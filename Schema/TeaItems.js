@@ -12,14 +12,14 @@ const batchDetailSchema = new mongoose.Schema({
   Qty_per_Bag: { type: String, default: '' },
   Sale_Broker_Lot: { type: String, default: '' },
   W_h: { type: String, default: '' }
-});
+},{timestamps: true});
 
 // Define the Item schema
 const itemSchema = new mongoose.Schema({
   Item_ID: { type: String, required: true },
   Product_Name: { type: String, required: true },
   Batch_Details: [batchDetailSchema] // Array of BatchDetail subdocuments
-});
+},{timestamps: true});
 
 // Create the models
 const Item = mongoose.model('Item', itemSchema);

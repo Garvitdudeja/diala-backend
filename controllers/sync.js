@@ -30,6 +30,7 @@ exports.createSync = async (req, res) => {
     }
 
     const hitTimes = data[currentDate];
+    console.log(data,hitTimes,"hittttttttttttttt")
 
     // Check if the request can be processed
     if (hitTimes.length >= 3) {
@@ -41,7 +42,7 @@ exports.createSync = async (req, res) => {
 
     console.log("timeDiff", timeDiff);
 
-    if (timeDiff < 10860) {
+    if (timeDiff < 0) {
       console.log("timeDiff < 60");
       // Assuming 60 seconds as the threshold for "in a row"
       return res
