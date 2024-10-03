@@ -1,36 +1,21 @@
-const fs = require("fs").promises;
-const path = require("path");
+const mongoose = require("mongoose");
 const main = require("../main");
 const { getRecordsInCreator } = require("./subform");
+const Sync = require('./../Schema/SyncSchme.js');
 
-const SYNC_FILE_PATH = path.join(__dirname, "sync.json");
 
 exports.createSync = async (req, res) => {
   try {
-    // Read the sync.json file
-    let data;
-    try {
-      const fileContent = await fs.readFile(SYNC_FILE_PATH, "utf8");
-      data = JSON.parse(fileContent);
-    } catch (err) {
-      if (err.code === "ENOENT") {
-        // If the file doesn't exist, initialize it
-        data = {};
-      } else {
-        throw err;
-      }
-    }
-
     const currentDate = new Date().toISOString().split("T")[0]; // Get the current date in YYYY-MM-DD format
     const currentTime = new Date().getTime(); // Get the current timestamp
 
-    // If the current date key is not present, initialize it with an empty array
-    if (!data[currentDate]) {
-      data[currentDate] = [];
+    // Find or create a document for the current date
+    let syncDoc = await Sync.findOne({ date: currentDate });
+    if (!syncDoc) {
+      syncDoc = new Sync({ date: currentDate });
     }
 
-    const hitTimes = data[currentDate];
-    console.log(data,hitTimes,"hittttttttttttttt")
+    const hitTimes = syncDoc.hitTimes;
 
     // Check if the request can be processed
     if (hitTimes.length >= 3) {
@@ -40,14 +25,8 @@ exports.createSync = async (req, res) => {
     const lastHitTime = hitTimes[hitTimes.length - 1];
     const timeDiff = (currentTime - lastHitTime) / 1000; // time difference in seconds
 
-    console.log("timeDiff", timeDiff);
-
-    if (timeDiff < 0) {
-      console.log("timeDiff < 60");
-      // Assuming 60 seconds as the threshold for "in a row"
-      return res
-        .status(429)
-        .json({ error: "Too many requests in a short period " });
+    if (timeDiff < 60) { // Assuming 60 seconds as the threshold for "in a row"
+      return res.status(429).json({ error: "Too many requests in a short period " });
     }
 
     // Push the current hit time to the array
@@ -60,15 +39,9 @@ exports.createSync = async (req, res) => {
 
     await main.main();
 
-    console.log("data for sync", data);
-
-    const dir = path.dirname(SYNC_FILE_PATH);
-
-    // Ensure the directory exists, if not, create it
-    await fs.mkdir(dir, { recursive: true });
-
-    // Save the updated data back to sync.json
-    await fs.writeFile(SYNC_FILE_PATH, JSON.stringify(data, null, 2), "utf8");
+    // Save the updated document
+    syncDoc.hitTimes = hitTimes;
+    await syncDoc.save();
 
     res.status(200).json({ message: "Sync created successfully" });
   } catch (err) {
@@ -79,24 +52,14 @@ exports.createSync = async (req, res) => {
 
 exports.getLastSyncTime = async (req, res) => {
   try {
-    // Read the sync.json file
-    const fileContent = await fs.readFile(SYNC_FILE_PATH, "utf8");
-    const data = JSON.parse(fileContent);
-
     const currentDate = new Date().toISOString().split("T")[0]; // Get the current date in YYYY-MM-DD format
 
-    // If the current date key is not present, return an empty array
-    if (!data[currentDate]) {
+    const syncDoc = await Sync.findOne({ date: currentDate });
+    if (!syncDoc) {
       return res.status(200).json({ lastSyncTime: [] });
     }
 
-    const hitTimes = data[currentDate];
-
-    hitTimes.map((time, index) => {
-      hitTimes[index] = new Date(time).toLocaleTimeString();
-    });
-
-    // convert the timestamps to the readable format
+    const hitTimes = syncDoc.hitTimes.map(time => new Date(time).toLocaleTimeString());
 
     res.status(200).json({ lastSyncTime: hitTimes });
   } catch (err) {

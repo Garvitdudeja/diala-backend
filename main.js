@@ -5,6 +5,7 @@ const orgId = "60015091101";
 const workspaceId = "243549000000036425";
 const viewId = "243549000001864122";
 const fs = require("fs");
+const { Item } = require("./Schema/TeaItems");
 
 const zohoClientId = "1000.ZW53NLBZ0Y1A3DG0LGWF0NU3N2ZTPI";
 const zohoClientSecret = "e80a1e3106a5e9e079908efebf32625c0185900ae1";
@@ -211,8 +212,10 @@ async function main(jobiddata) {
     }));
 
     // convert complete data to json
-
-    fs.writeFileSync("data.json", JSON.stringify(completedata, null, 4));
+    await Item.deleteMany();
+    console.log("deleted All complete")
+    await Item.create(completedata);
+    // fs.writeFileSync("data.json", JSON.stringify(completedata, null, 4));
 
     // process.exit(0);
 
