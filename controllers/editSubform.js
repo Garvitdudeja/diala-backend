@@ -256,38 +256,72 @@ exports.getSelectedPackages = async (req, res) => {
 };
 
 // Function to update the Required_Quantity in dataJson
-exports.updateRequiredQuantity = async (subform, operation) => {
+exports.updateRequiredQuantity = (subform, dataJson, operation) => {
   // Iterate through the subform array from the webhook
-  for (const webhookItem of subform) {
+  console.log("operation", operation);
+  subform.forEach((webhookItem) => {
     const batchId = webhookItem.Batch_ID;
     const requiredQuantity = parseFloat(webhookItem.Required_Quantity);
 
-    // Find the item with the given batch ID in its Batch_Details
-    const item = await Item.findOne({ 'Batch_Details.Batch_ID': batchId });
-    
-    if (item) {
-      const batch = item.Batch_Details.find((batch) => batch.Batch_ID === batchId);
-      
-      if (batch) {
-        // Update the Available_Quantity based on the operation
-        if (operation === "approve") {
-          batch.Available_Quantity -= requiredQuantity;
-        } else {
-          batch.Available_Quantity += requiredQuantity;
+    // Loop over dataJson to find the matching Batch_ID
+    dataJson.forEach((item) => {
+      item.Batch_Details.forEach((batch) => {
+        if (batch.Batch_ID === batchId) {
+          // Update the Required_Quantity if Batch_ID matches
+          if (operation === "approve") {
+            console.log("requiredQuantity", requiredQuantity);
+            console.log("batch.Available_Quantity", batch.Available_Quantity);
+            batch.Available_Quantity -= requiredQuantity;
+          } else {
+            console.log("requiredQuantity", requiredQuantity);
+            console.log("batch.Available_Quantity", batch.Available_Quantity);
+            console.log("batch id", batch.Batch_ID);
+            batch.Available_Quantity += requiredQuantity;
+            console.log("batch.Available_Quantity", batch.Available_Quantity);
+          }
+          // batch.Available_Quantity -= requiredQuantity;
         }
+      });
+    });
+  });
 
-        // Save the updated item
-        await item.save();
-      } else {
-        console.log(`Batch with ID ${batchId} not found.`);
-      }
-    } else {
-      console.log(`Item containing batch with ID ${batchId} not found.`);
-    }
-  }
-
-  console.log('Batch details updated successfully.');
+  return dataJson;
 };
+
+
+// exports.updateRequiredQuantity = async (subform, operation) => {
+//   // Iterate through the subform array from the webhook
+//   for (const webhookItem of subform) {
+//     const batchId = webhookItem.Batch_ID;
+//     const requiredQuantity = parseFloat(webhookItem.Required_Quantity);
+
+//     // Find the item with the given batch ID in its Batch_Details
+//     const item = await Item.findOne({ 'Batch_Details.Batch_ID': batchId });
+    
+//     if (item) {
+//       const batch = item.Batch_Details.find((batch) => batch.Batch_ID === batchId);
+      
+//       if (batch) {
+//         // Update the Available_Quantity based on the operation
+//         if (operation === "approve") {
+//           batch.Available_Quantity -= requiredQuantity;
+//         } else {
+//           batch.Available_Quantity += requiredQuantity;
+//         }
+
+//         // Save the updated item
+//         await item.save();
+//       } else {
+//         console.log(`Batch with ID ${batchId} not found.`);
+//       }
+//     } else {
+//       console.log(`Item containing batch with ID ${batchId} not found.`);
+//     }
+//   }
+
+//   console.log('Batch details updated successfully.');
+// };
+
 
 // Function to save updated JSON to file
 exports.saveUpdatedJson = (updatedData, filePath) => {
