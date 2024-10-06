@@ -212,9 +212,9 @@ async function sendDataToZohoCreator(payload) {
 
       // console.log("updatedJson", updatedJson);
 
-      const dataFilePath = path.join(__dirname, "../data.json");
+      // const dataFilePath = path.join(__dirname, "../data.json");
 
-      saveUpdatedJson(updatedJson, dataFilePath);
+      // saveUpdatedJson(updatedJson, dataFilePath);
     }
 
     return { message: response.data.message };
@@ -267,9 +267,9 @@ async function updateToZohoCreator(payload, record_id) {
 
       // console.log("updatedJson", updatedJson);
 
-      const dataFilePath = path.join(__dirname, "../data.json");
+      // const dataFilePath = path.join(__dirname, "../data.json");
 
-      saveUpdatedJson(updatedJson, dataFilePath);
+      // saveUpdatedJson(updatedJson, dataFilePath);
     }
 
     return { message: response.data.message };

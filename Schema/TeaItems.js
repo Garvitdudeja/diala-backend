@@ -2,13 +2,13 @@ const mongoose = require('mongoose');
 
 // Define the BatchDetail schema
 const batchDetailSchema = new mongoose.Schema({
-  Batch_ID: { type: String, required: true },
-  Batch_No: { type: String, required: true },
+  Batch_ID: { type: String},
+  Batch_No: { type: String},
   Bill_No: { type: String, default: '' },
-  Available_Quantity: { type: Number, required: true },
-  Bill_ID: { type: String, required: true },
-  Garden: { type: String, required: true },
-  Grade: { type: String, required: true },
+  Available_Quantity: { type: Number},
+  Bill_ID: { type: String},
+  Garden: { type: String},
+  Grade: { type: String},
   Qty_per_Bag: { type: String, default: '' },
   Sale_Broker_Lot: { type: String, default: '' },
   W_h: { type: String, default: '' }
@@ -16,8 +16,8 @@ const batchDetailSchema = new mongoose.Schema({
 
 // Define the Item schema
 const itemSchema = new mongoose.Schema({
-  Item_ID: { type: String, required: true },
-  Product_Name: { type: String, required: true },
+  Item_ID: { type: String},
+  Product_Name: { type: String},
   Batch_Details: [batchDetailSchema] // Array of BatchDetail subdocuments
 },{timestamps: true});
 

@@ -320,7 +320,7 @@ exports.updateRequiredQuantity = async (subform, operation) => {
       console.log(`Item containing batch with ID ${batchId} not found.`);
     }
   }
-
+  return true
   console.log('Batch details updated successfully.');
 };
 
@@ -359,7 +359,7 @@ exports.webhook = async (req, res) => {
 
   console.log("updatedData", updatedData[1]);
   // Save the updated data back to data.json
-  exports.saveUpdatedJson(updatedData, dataFilePath);
+  // exports.saveUpdatedJson(updatedData, dataFilePath);
 
   res.status(200).send("success");
 };
