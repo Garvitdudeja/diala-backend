@@ -4,6 +4,7 @@ const { updateRequiredQuantity, saveUpdatedJson } = require("./editSubform");
 const path = require("path");
 const fs = require("fs");
 const { Item, BatchDetail } = require("../Schema/TeaItems");
+const moment = require("moment");
 
 
 const zohoClientId = "1000.ZW53NLBZ0Y1A3DG0LGWF0NU3N2ZTPI";
@@ -393,14 +394,13 @@ exports.getRecordsInCreator = async () => {
     const data = await response.json();
 
     // Get current date in the format 'yyyy-MM-dd'
-    const currentDate = new Date().toISOString().split("T")[0];
+    const currentDate = moment().format('DD-MMM-YYYY');  // Get the current date in DD-MMM-YYYY format
 
-    // Filter records where Added_Date equals current date
-    const filteredByDate = data.data.filter(
-      (item) => item.Added_Date === currentDate
-    );
-
-    console.log("filteredByDate", filteredByDate);
+    const filteredByDate = data.data.filter((item) => {
+      const addedDate = moment(item.Added_Time, 'DD-MMM-YYYY HH:mm:ss').format('DD-MMM-YYYY');
+      return addedDate === currentDate;
+    });
+    
 
     // Further filter by 'draft' type_field
     const isDraft = filteredByDate.filter(
